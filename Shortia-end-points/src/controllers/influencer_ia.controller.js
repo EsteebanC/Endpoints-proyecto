@@ -1,44 +1,51 @@
-let influencer_ia = [
-  { ID_IA: 1, Nombre: "Sofia IA",
-    Descripcion: "Influencer virtual de moda",
-    Algoritmo: "GAN-v3",
-    Fecha_Creacion: "2026-01-01",
-    ID_Agencia: 1 }
-];
+const model = require('../models/influencer_ia.model');
 
-const getAll = (req, res) => {
-  res.json({ ok: true, data: influencer_ia });
+const getAll = async (req, res) => {
+  try {
+    const data = await model.getAll();
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const getById = (req, res) => {
-  const item = influencer_ia.find(
-    p => p.ID_IA == req.params.id
-  );
-  if (!item) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  res.json({ ok: true, data: item });
+const getById = async (req, res) => {
+  try {
+    const item = await model.getById(req.params.id);
+    if (!item) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: item });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const create = (req, res) => {
-  const nuevo = { ID_IA: Date.now(), ...req.body };
-  influencer_ia.push(nuevo);
-  res.status(201).json({ ok: true, data: nuevo });
+const create = async (req, res) => {
+  try {
+    const nuevo = await model.create(req.body);
+    res.status(201).json({ ok: true, data: nuevo });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const update = (req, res) => {
-  const index = influencer_ia.findIndex(p => p.ID_IA == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  influencer_ia[index] = { ...influencer_ia[index], ...req.body };
-  res.json({ ok: true, data: influencer_ia[index] });
+const update = async (req, res) => {
+  try {
+    const actualizado = await model.update(req.params.id, req.body);
+    if (!actualizado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: { id: req.params.id, ...req.body } });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const remove = (req, res) => {
-  const index = influencer_ia.findIndex(p => p.ID_IA == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  const eliminado = influencer_ia.splice(index, 1);
-  res.json({ ok: true, data: eliminado[0] });
+const remove = async (req, res) => {
+  try {
+    const eliminado = await model.remove(req.params.id);
+    if (!eliminado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, msg: 'Eliminado correctamente' });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
 module.exports = { getAll, getById, create, update, remove };

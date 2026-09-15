@@ -1,43 +1,51 @@
-let comentarios = [
-  { ID_Comentario: 1, ID_Usuario: 1,
-    ID_Publicacion: 1,
-    Contenido: "Excelente contenido",
-    Fecha: "2026-01-06" }
-];
+const model = require('../models/comentarios.model');
 
-const getAll = (req, res) => {
-  res.json({ ok: true, data: comentarios });
+const getAll = async (req, res) => {
+  try {
+    const data = await model.getAll();
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const getById = (req, res) => {
-  const item = comentarios.find(
-    p => p.ID_Comentario == req.params.id
-  );
-  if (!item) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  res.json({ ok: true, data: item });
+const getById = async (req, res) => {
+  try {
+    const item = await model.getById(req.params.id);
+    if (!item) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: item });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const create = (req, res) => {
-  const nuevo = { ID_Comentario: Date.now(), ...req.body };
-  comentarios.push(nuevo);
-  res.status(201).json({ ok: true, data: nuevo });
+const create = async (req, res) => {
+  try {
+    const nuevo = await model.create(req.body);
+    res.status(201).json({ ok: true, data: nuevo });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const update = (req, res) => {
-  const index = comentarios.findIndex(p => p.ID_Comentario == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  comentarios[index] = { ...comentarios[index], ...req.body };
-  res.json({ ok: true, data: comentarios[index] });
+const update = async (req, res) => {
+  try {
+    const actualizado = await model.update(req.params.id, req.body);
+    if (!actualizado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: { id: req.params.id, ...req.body } });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const remove = (req, res) => {
-  const index = comentarios.findIndex(p => p.ID_Comentario == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  const eliminado = comentarios.splice(index, 1);
-  res.json({ ok: true, data: eliminado[0] });
+const remove = async (req, res) => {
+  try {
+    const eliminado = await model.remove(req.params.id);
+    if (!eliminado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, msg: 'Eliminado correctamente' });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
 module.exports = { getAll, getById, create, update, remove };

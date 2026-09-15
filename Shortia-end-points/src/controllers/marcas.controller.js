@@ -1,43 +1,51 @@
-let marcas = [
-  { ID_Marca: 1, ID_Contratos: 1,
-    Nombre: "MarcaX",
-    Producto: "Ropa deportiva",
-    Requisitos: "Mencion en 3 posts" }
-];
+const model = require('../models/marcas.model');
 
-const getAll = (req, res) => {
-  res.json({ ok: true, data: marcas });
+const getAll = async (req, res) => {
+  try {
+    const data = await model.getAll();
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const getById = (req, res) => {
-  const item = marcas.find(
-    p => p.ID_Marca == req.params.id
-  );
-  if (!item) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  res.json({ ok: true, data: item });
+const getById = async (req, res) => {
+  try {
+    const item = await model.getById(req.params.id);
+    if (!item) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: item });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const create = (req, res) => {
-  const nuevo = { ID_Marca: Date.now(), ...req.body };
-  marcas.push(nuevo);
-  res.status(201).json({ ok: true, data: nuevo });
+const create = async (req, res) => {
+  try {
+    const nuevo = await model.create(req.body);
+    res.status(201).json({ ok: true, data: nuevo });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const update = (req, res) => {
-  const index = marcas.findIndex(p => p.ID_Marca == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  marcas[index] = { ...marcas[index], ...req.body };
-  res.json({ ok: true, data: marcas[index] });
+const update = async (req, res) => {
+  try {
+    const actualizado = await model.update(req.params.id, req.body);
+    if (!actualizado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: { id: req.params.id, ...req.body } });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const remove = (req, res) => {
-  const index = marcas.findIndex(p => p.ID_Marca == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  const eliminado = marcas.splice(index, 1);
-  res.json({ ok: true, data: eliminado[0] });
+const remove = async (req, res) => {
+  try {
+    const eliminado = await model.remove(req.params.id);
+    if (!eliminado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, msg: 'Eliminado correctamente' });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
 module.exports = { getAll, getById, create, update, remove };

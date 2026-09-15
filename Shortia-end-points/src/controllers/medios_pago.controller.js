@@ -1,43 +1,51 @@
-let medios_pago = [
-  { ID_Pago: 1, Moneda: "COP",
-    Proveedor: "PayU",
-    Tipo: "tarjeta",
-    ID_Transaccion: 1 }
-];
+const model = require('../models/medios_pago.model');
 
-const getAll = (req, res) => {
-  res.json({ ok: true, data: medios_pago });
+const getAll = async (req, res) => {
+  try {
+    const data = await model.getAll();
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const getById = (req, res) => {
-  const item = medios_pago.find(
-    p => p.ID_Pago == req.params.id
-  );
-  if (!item) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  res.json({ ok: true, data: item });
+const getById = async (req, res) => {
+  try {
+    const item = await model.getById(req.params.id);
+    if (!item) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: item });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const create = (req, res) => {
-  const nuevo = { ID_Pago: Date.now(), ...req.body };
-  medios_pago.push(nuevo);
-  res.status(201).json({ ok: true, data: nuevo });
+const create = async (req, res) => {
+  try {
+    const nuevo = await model.create(req.body);
+    res.status(201).json({ ok: true, data: nuevo });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const update = (req, res) => {
-  const index = medios_pago.findIndex(p => p.ID_Pago == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  medios_pago[index] = { ...medios_pago[index], ...req.body };
-  res.json({ ok: true, data: medios_pago[index] });
+const update = async (req, res) => {
+  try {
+    const actualizado = await model.update(req.params.id, req.body);
+    if (!actualizado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, data: { id: req.params.id, ...req.body } });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
-const remove = (req, res) => {
-  const index = medios_pago.findIndex(p => p.ID_Pago == req.params.id);
-  if (index === -1) return res.status(404)
-    .json({ ok: false, msg: 'No encontrado' });
-  const eliminado = medios_pago.splice(index, 1);
-  res.json({ ok: true, data: eliminado[0] });
+const remove = async (req, res) => {
+  try {
+    const eliminado = await model.remove(req.params.id);
+    if (!eliminado) return res.status(404).json({ ok: false, msg: 'No encontrado' });
+    res.json({ ok: true, msg: 'Eliminado correctamente' });
+  } catch (err) {
+    res.status(500).json({ ok: false, msg: err.message });
+  }
 };
 
 module.exports = { getAll, getById, create, update, remove };
