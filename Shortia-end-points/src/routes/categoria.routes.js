@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/categoria.controller');
+const verifyToken = require('../middleware/auth.middleware');
 
-router.get('/', ctrl.getAll);
-router.get('/:id', ctrl.getById);
-router.post('/', ctrl.create);
-router.put('/:id', ctrl.update);
-router.delete('/:id', ctrl.remove);
+// Todas las rutas requieren token
+router.get('/', verifyToken, ctrl.getAll);
+router.get('/:id', verifyToken, ctrl.getById);
+router.post('/', verifyToken, ctrl.create);
+router.put('/:id', verifyToken, ctrl.update);
+router.delete('/:id', verifyToken, ctrl.remove);
 
 module.exports = router;
