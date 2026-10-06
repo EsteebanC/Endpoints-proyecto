@@ -1,10 +1,19 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
-// Middleware para parsear JSON
+// Middleware
+app.use(cors());
 app.use(express.json());
 
+// Health check (público)
+app.get('/health', (req, res) => {
+  res.status(200).json({ ok: true, status: 'OK', timestamp: new Date() });
+});
+
 // Rutas
+const authRouter = require('./routes/auth.routes');
 const agenciasRouter = require('./routes/agencias.routes');
 const transaccionesRouter = require('./routes/transacciones.routes');
 const medios_pagoRouter = require('./routes/medios_pago.routes');
@@ -25,6 +34,10 @@ const reportesRouter = require('./routes/reportes.routes');
 const estadisticasRouter = require('./routes/estadisticas.routes');
 const categoriaRouter = require('./routes/categoria.routes');
 
+// Autenticación (login y register son públicas, /me es privada)
+app.use('/api/auth', authRouter);
+
+// Rutas de la API (cada router define qué rutas son públicas y cuáles privadas)
 app.use('/api/agencias', agenciasRouter);
 app.use('/api/transacciones', transaccionesRouter);
 app.use('/api/medios_pago', medios_pagoRouter);
@@ -44,5 +57,16 @@ app.use('/api/redes_sociales', redes_socialesRouter);
 app.use('/api/reportes', reportesRouter);
 app.use('/api/estadisticas', estadisticasRouter);
 app.use('/api/categoria', categoriaRouter);
+
+// Rutas inexistentes
+app.use((req, res) => {
+  res.status(404).json({ ok: false, msg: `No se puede encontrar ${req.originalUrl} en este servidor!` });
+});
+
+// Manejo de errores
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({ ok: false, msg: err.message || 'Error interno del servidor' });
+});
 
 module.exports = app;
