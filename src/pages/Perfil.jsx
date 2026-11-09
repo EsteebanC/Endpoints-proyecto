@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Perfil() {
-  const { user, logout, loading } = useAuth()
+  const { user, logout, loading } = useAuth() // useAuth para acceder al estado del usuario, 
+  // la función de cerrar sesión y el estado de carga
   const navigate = useNavigate()
 
   useEffect(() => {

@@ -25,4 +25,4 @@ api.interceptors.response.use(
   },
 )
 
-export default api
+export default api // exportamos la instancia de axios para usarla en otros archivos
