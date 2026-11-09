@@ -2,12 +2,18 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+const FORM_INICIAL = {
+  Username: '',
+  Email: '',
+  Password: '',
+  Nombre: '',
+  Edad: '',
+  Genero: '',
+  Pais: '',
+}
+
 export default function Register() {
-  const [form, setForm] = useState({
-    Username: '',
-    Email: '',
-    Password: '',
-  })
+  const [form, setForm] = useState(FORM_INICIAL)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
@@ -38,7 +44,7 @@ export default function Register() {
     <div className="auth-page">
       <div className="auth-card">
         <h1>Crear cuenta</h1>
-        <p className="auth-subtitle">Regístrate para entrar a Shortia.</p>
+        <p className="auth-subtitle">Completa tus datos para entrar a Shortia.</p>
 
         {error && <div className="form-message error">{error}</div>}
         {success && <div className="form-message success">{success}</div>}
@@ -79,6 +85,64 @@ export default function Register() {
               value={form.Password}
               onChange={handleChange}
               placeholder="Tu contraseña"
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="Nombre">Nombre completo</label>
+            <input
+              id="Nombre"
+              name="Nombre"
+              required
+              value={form.Nombre}
+              onChange={handleChange}
+              placeholder="Tu nombre"
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="Edad">Edad</label>
+            <input
+              id="Edad"
+              name="Edad"
+              type="number"
+              required
+              min="1"
+              max="120"
+              value={form.Edad}
+              onChange={handleChange}
+              placeholder="Ej: 22"
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="Genero">Género</label>
+            <select
+              id="Genero"
+              name="Genero"
+              required
+              value={form.Genero}
+              onChange={handleChange}
+            >
+              <option value="" disabled>
+                Selecciona una opción
+              </option>
+              <option value="Femenino">Femenino</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Otro">Otro</option>
+              <option value="Prefiero no decirlo">Prefiero no decirlo</option>
+            </select>
+          </div>
+
+          <div className="field">
+            <label htmlFor="Pais">País</label>
+            <input
+              id="Pais"
+              name="Pais"
+              required
+              value={form.Pais}
+              onChange={handleChange}
+              placeholder="Ej: Colombia"
             />
           </div>
 
