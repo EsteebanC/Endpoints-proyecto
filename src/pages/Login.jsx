@@ -16,7 +16,7 @@ export default function Login() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate('/perfil')
+      navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.msg || 'No se pudo iniciar sesión')
     } finally {

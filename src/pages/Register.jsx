@@ -32,7 +32,7 @@ export default function Register() {
     try {
       await register(form)
       setSuccess('Cuenta creada correctamente. Redirigiendo...')
-      setTimeout(() => navigate('/perfil'), 1200)
+      setTimeout(() => navigate('/dashboard'), 1200)
     } catch (err) {
       setError(err.response?.data?.msg || 'No se pudo crear la cuenta')
     } finally {
