@@ -13,6 +13,7 @@ export default function Home() {
             <Link to="/">Inicio</Link>
             {user ? (
               <>
+                <Link to="/dashboard">Dashboard</Link>
                 <Link to="/perfil">Mi perfil</Link>
                 <button type="button" className="nav-cta" onClick={logout}>
                   Cerrar sesión

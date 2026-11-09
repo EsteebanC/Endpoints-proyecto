@@ -39,6 +39,9 @@ export default function Register() {
       setSuccess('Cuenta creada correctamente. Redirigiend  o...')
       setTimeout(() => navigate('/perfil'), 1200) // redirige a la página de perfil 
       // después de 1.2 segundos
+      await register(form)
+      setSuccess('Cuenta creada correctamente. Redirigiendo...')
+      setTimeout(() => navigate('/dashboard'), 1200)
     } catch (err) {
       setError(err.response?.data?.msg || 'No se pudo crear la cuenta')
     } finally {
