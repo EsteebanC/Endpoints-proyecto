@@ -5,13 +5,14 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Perfil from './pages/Perfil'
+import Dashboard from './pages/Dashboard'
 
 // Ruta pública: solo accesible si NO hay sesión
 function PublicRoute({ children }) {
   const { loading, user } = useAuth()
 
   if (loading) return null
-  if (user) return <Navigate to="/perfil" replace />
+  if (user) return <Navigate to="/dashboard" replace />
   return children
 }
 
@@ -38,6 +39,7 @@ function AppInner() {
       />
       <Route element={<ProtectedRoute />}>
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

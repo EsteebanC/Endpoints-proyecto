@@ -28,6 +28,7 @@ export default function Perfil() {
           <Link to="/" className="logo">Shortia</Link>
           <nav className="nav">
             <Link to="/">Inicio</Link>
+            <Link to="/dashboard">Dashboard</Link>
             <Link to="/perfil">Mi perfil</Link>
             <button
               type="button"
