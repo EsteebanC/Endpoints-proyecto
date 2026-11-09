@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
   const token = header.startsWith('Bearer ') ? header.slice(7) : header;
 
   try {
-    const decoded = jwt.verify(token, config.jwt.secret);
+    const decoded = jwt.verify(token, config.jwt.secret); // decoded para obtener los datos del usuario
     req.user = decoded;
     next();
   } catch (error) {

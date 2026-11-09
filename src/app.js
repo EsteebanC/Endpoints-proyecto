@@ -4,8 +4,15 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+// En desarrollo el frontend puede abrirse en 5173, 5174, etc.
+const esOrigenLocal = (origin) =>
+  !origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
+
+app.use(cors({
+  origin: (origin, callback) => callback(null, esOrigenLocal(origin)),
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.use(express.json()); // Parsea el cuerpo de las solicitudes como JSON
 
 // Health check (público)
 app.get('/health', (req, res) => {

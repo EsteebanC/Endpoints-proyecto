@@ -8,6 +8,6 @@ router.post('/register', ctrl.register);
 router.post('/login', ctrl.login);
 
 // Rutas privadas (requieren token)
-router.get('/me', verifyToken, ctrl.me);
+router.get('/me', verifyToken, ctrl.me); // lo ponemos privado para que solo el usuario autenticado pueda ver su perfil
 
 module.exports = router;

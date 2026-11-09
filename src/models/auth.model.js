@@ -3,7 +3,7 @@ const pool = require('../config/db');
 // ? = placeholder seguro (evita SQL Injection)
 
 const findByEmail = async (email) => {
-  const [rows] = await pool.query(
+  const [rows] = await pool.query( // pool.query devuelve un array: [rows, fields]
     'SELECT * FROM usuarios WHERE Email = ?', [email]
   );
   return rows[0]; // undefined si no existe
@@ -26,7 +26,7 @@ const getPerfil = async (id) => {
 const create = async ({ Username, Email, Contrasena, Nombre, Edad, Genero, Pais }) => {
   const conn = await pool.getConnection();
   try {
-    await conn.beginTransaction();
+    await conn.beginTransaction(); // begin transaction para que si algo falla, se haga rollback y no se guarde nada
 
     const [persona] = await conn.query(
       'INSERT INTO personas (Nombre, Edad, Genero, Pais) VALUES (?, ?, ?, ?)',

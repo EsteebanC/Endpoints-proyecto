@@ -1,7 +1,19 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const config = require('../config/jwt.config');
 const model = require('../models/auth.model');
+
+// La base de datos trae usuarios antiguos guardados con SHA-256.
+// Los usuarios nuevos se guardan con bcrypt.
+const passwordValida = async (password, hashGuardado) => {
+  if (!hashGuardado) return false;
+  if (hashGuardado.startsWith('$2')) {
+    return bcrypt.compare(password, hashGuardado);
+  }
+  const sha256 = crypto.createHash('sha256').update(password).digest('hex');
+  return sha256 === hashGuardado;
+};
 
 // Genera el token firmado con el secret del .env
 const generarToken = (usuario) =>
@@ -30,8 +42,8 @@ const register = async (req, res) => {
       return res.status(409).json({ ok: false, msg: 'El email ya está registrado' });
     }
 
-    const hashedPassword = await bcrypt.hash(Password, 10);
-
+    const hashedPassword = await bcrypt.hash(Password, 10); // 10 rounds de sal para el hash
+    
     const usuario = await model.create({
       Username,
       Email,
@@ -65,7 +77,7 @@ const login = async (req, res) => {
 
     const usuario = await model.findByEmail(Email);
 
-    if (!usuario || !(await bcrypt.compare(Password, usuario.Contrasena))) {
+    if (!usuario || !(await passwordValida(Password, usuario.Contrasena))) {
       return res.status(401).json({ ok: false, msg: 'Credenciales inválidas' });
     }
 
