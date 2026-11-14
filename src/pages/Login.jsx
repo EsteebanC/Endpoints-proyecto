@@ -1,11 +1,17 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
-  const [email, setEmail] = useState('')
+  const location = useLocation()
+  const [email, setEmail] = useState(location.state?.email || '')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(
+    location.state?.registered
+      ? 'Cuenta creada correctamente. Ahora inicia sesión.'
+      : '',
+  )
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -13,6 +19,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
     try {
       await login(email, password)
@@ -31,6 +38,7 @@ export default function Login() {
         <p className="auth-subtitle">Entra con tu correo y contraseña.</p>
 
         {error && <div className="form-message error">{error}</div>}
+        {success && <div className="form-message success">{success}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="field">
