@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
+// useEffect para ejecutar código al montar el componente y 
+// usestate para guardar el estado de los datos del dashboard
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
+// Formatea un número a formato de moneda colombiana
 const formatearNumero = (valor) => Number(valor || 0).toLocaleString('es-CO')
+
 
 const formatearFecha = (valor) => {
   if (!valor) return '—'
@@ -11,7 +15,7 @@ const formatearFecha = (valor) => {
 }
 
 export default function Dashboard() {
-  const { user, logout } = useAuth()
+  const { user, x } = useAuth()
   const navigate = useNavigate()
 
   const [perfil, setPerfil] = useState(null)
@@ -42,7 +46,9 @@ export default function Dashboard() {
           api.get('/estadisticas'),
         ])
 
-        setPerfil(perfilRes.data.data)
+        setPerfil(perfilRes.data.data) // perfilRes contiene los datos del perfil 
+        // del usuario logueado,
+
         // Solo se guardan los campos necesarios: nunca la contraseña.
         setUsuarios(
           (usuariosRes.data.data || []).map((usuario) => ({
@@ -68,8 +74,12 @@ export default function Dashboard() {
     cargarDatos()
   }, [])
 
-  const datosPerfil = perfil || user
-  const estadistica = estadisticas[0]
+  
+  const datosPerfil = perfil || user // si no se pudo cargar a
+  // el perfil desde la API, se usa el perfil del usuario logueado
+
+  const estadistica = estadisticas[0] // si no se pudo cargar las
+  // estadísticas desde la API, se usa un objeto vacío
 
   return (
     <div className="page">

@@ -16,7 +16,7 @@ export default function Register() {
   const [form, setForm] = useState(FORM_INICIAL)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('') // success guarda el mensaje de éxito después de registrarse
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false) // Loaging guarda el estado de carga mientras se envía el formulario
   const { register } = useAuth()
   const navigate = useNavigate() // useNavigate redirige a la página de perfil 
   // después de registrarse
@@ -39,9 +39,7 @@ export default function Register() {
       setSuccess('Cuenta creada correctamente. Redirigiend  o...')
       setTimeout(() => navigate('/perfil'), 1200) // redirige a la página de perfil 
       // después de 1.2 segundos
-      await register(form)
-      setSuccess('Cuenta creada correctamente. Redirigiendo...')
-      setTimeout(() => navigate('/dashboard'), 1200)
+
     } catch (err) {
       setError(err.response?.data?.msg || 'No se pudo crear la cuenta')
     } finally {

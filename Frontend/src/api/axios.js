@@ -19,9 +19,11 @@ api.interceptors.response.use(
     const esAuth = err.config?.url?.includes('/auth/')
     if (err.response?.status === 401 && !esAuth) {
       localStorage.removeItem('token')
-      window.location.href = '/login'
+      window.location.href = '/login' // redirige a la página de login si el 
+      // token es inválido o ha expirado
     }
-    return Promise.reject(err)
+    return Promise.reject(err) // promise para que el error se 
+    // propague y pueda ser manejado en el componente que hizo la petición
   },
 )
 
