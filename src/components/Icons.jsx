@@ -32,6 +32,16 @@ export function GridIcon(props) {
   )
 }
 
+export function HomeIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="m3 10 9-7 9 7" />
+      <path d="M5 9.5V21h14V9.5" />
+      <path d="M10 21v-6h4v6" />
+    </Svg>
+  )
+}
+
 export function UserIcon(props) {
   return (
     <Svg {...props}>

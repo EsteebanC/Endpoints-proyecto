@@ -1645,3 +1645,72 @@ button {
     width: 240px;
   }
 }
+
+/* ---------- Acceso al dashboard desde el sidebar ---------- */
+.app-sidebar-dash {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.app-sidebar-dash svg {
+  flex: 0 0 auto;
+}
+
+.app-sidebar-dash:hover {
+  background: #f0f2f4;
+  color: var(--text);
+}
+
+.app-sidebar-dash.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(31, 78, 121, 0.18);
+}
+
+.app-sidebar-dash.active:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+/* Elementos del feed que son solo visuales (no responden a clics). */
+.feed-static {
+  pointer-events: none;
+}
+
+/* Encabezado de la página Dashboard. */
+.app-page-head {
+  margin-bottom: 22px;
+}
+
+@media (max-width: 1100px) {
+  .app-sidebar-dash {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .app-sidebar-dash-label {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-sidebar-dash {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 12px;
+  }
+}
