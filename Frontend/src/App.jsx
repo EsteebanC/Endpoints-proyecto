@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 // componentes hijos accedan a la información del usuario y al estado de autenticación.
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
+import Feed from './pages/Feed'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Perfil from './pages/Perfil'
@@ -18,15 +19,25 @@ function PublicRoute({ children }) {
   if (loading) return null // si el estado de carga es true,
   //  no renderizamos nada hasta que se obtenga el estado de autenticación del usuario
 
-  if (user) return <Navigate to="/dashboard" replace />
+  if (user) return <Navigate to="/" replace />
   return children
-} // si hay usuario, redirige a dashboard, si no hay usuario, renderiza los hijos (children) 
+} // si hay usuario, redirige al inicio, si no hay usuario, renderiza los hijos (children) 
 // que son las rutas públicas (login y register)
+
+// El inicio muestra el feed para usuarios autenticados y la landing pública
+// para los visitantes que todavía no tienen sesión.
+function InicioRoute() {
+  const { loading, user } = useAuth()
+
+  if (loading) return null
+
+  return user ? <Feed /> : <Home />
+}
 
 function AppInner() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<InicioRoute />} />
       <Route path="/home" element={<Navigate to="/" replace />} />
       <Route
         path="/login"

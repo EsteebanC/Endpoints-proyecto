@@ -23,7 +23,7 @@ export default function Login() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate('/dashboard')
+      navigate('/')
     } catch (err) {
       setError(err.response?.data?.msg || 'No se pudo iniciar sesión')
     } finally {
