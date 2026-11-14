@@ -15,7 +15,6 @@ export default function Dashboard() {
   const navigate = useNavigate()
 
   const [perfil, setPerfil] = useState(null)
-  const [usuarios, setUsuarios] = useState([])
   const [publicaciones, setPublicaciones] = useState([])
   const [contratos, setContratos] = useState([])
   const [seguidores, setSeguidores] = useState([])
@@ -28,14 +27,12 @@ export default function Dashboard() {
       try {
         const [
           perfilRes,
-          usuariosRes,
           publicacionesRes,
           contratosRes,
           seguidoresRes,
           estadisticasRes,
         ] = await Promise.all([
           api.get('/auth/me'),
-          api.get('/usuarios'),
           api.get('/publicaciones'),
           api.get('/contratos'),
           api.get('/seguidores'),
@@ -43,15 +40,6 @@ export default function Dashboard() {
         ])
 
         setPerfil(perfilRes.data.data)
-        // Solo se guardan los campos necesarios: nunca la contraseña.
-        setUsuarios(
-          (usuariosRes.data.data || []).map((usuario) => ({
-            ID_Usuario: usuario.ID_Usuario,
-            Username: usuario.Username,
-            Email: usuario.Email,
-            Fecha_Registro: usuario.Fecha_Registro,
-          })),
-        )
         setPublicaciones(publicacionesRes.data.data || [])
         setContratos(contratosRes.data.data || [])
         setSeguidores(seguidoresRes.data.data || [])
@@ -129,10 +117,6 @@ export default function Dashboard() {
               <article className="stat-card">
                 <span>Seguidores</span>
                 <strong>{seguidores.length}</strong>
-              </article>
-              <article className="stat-card">
-                <span>Usuarios</span>
-                <strong>{usuarios.length}</strong>
               </article>
             </section>
 
@@ -317,36 +301,6 @@ export default function Dashboard() {
                 )}
               </section>
             </div>
-
-            <section className="panel">
-              <h2>Usuarios registrados</h2>
-              {usuarios.length === 0 ? (
-                <p className="dash-empty">No hay usuarios registrados.</p>
-              ) : (
-                <div className="tabla-wrap">
-                  <table className="tabla">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Correo</th>
-                        <th>Fecha de registro</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {usuarios.slice(0, 10).map((usuario) => (
-                        <tr key={usuario.ID_Usuario}>
-                          <td>{usuario.ID_Usuario}</td>
-                          <td>{usuario.Username || '—'}</td>
-                          <td>{usuario.Email || '—'}</td>
-                          <td>{formatearFecha(usuario.Fecha_Registro)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
           </>
         )}
       </main>
