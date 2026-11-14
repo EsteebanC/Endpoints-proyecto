@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const api = axios.create({
   // Si no hay .env, usa el backend local por defecto.
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api', // poner url del render
 })
 
 api.interceptors.request.use((config) => {

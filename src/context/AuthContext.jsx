@@ -34,13 +34,10 @@ export function AuthProvider({ children }) { //children es el contenido que se r
     setUser(await obtenerPerfil())
   }
 
+  // El registro no inicia sesión automáticamente: el usuario debe entrar
+  // con sus credenciales desde el login.
   const register = async (datos) => {
-    const data = await registrar(datos)
-    if (data.token) {
-      localStorage.setItem('token', data.token)
-      setUser(await obtenerPerfil())
-    }
-    return data
+    return registrar(datos)
   }
 
   return (

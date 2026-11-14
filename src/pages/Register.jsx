@@ -1,6 +1,7 @@
-import { useState } from 'react' // usestate guarda el estado de los inputs del formulario y los mensajes de error y éxito
-import { Link, useNavigate } from 'react-router-dom' // Link para navegar entre páginas y useNavigate para redirigir después de registrarse
-import { useAuth } from '../context/AuthContext' // use auth para acceder a la función de registro del contexto de autenticación
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import PaisSelect from '../components/PaisSelect'
 
 const FORM_INICIAL = {
   Username: '',
@@ -15,8 +16,7 @@ const FORM_INICIAL = {
 export default function Register() {
   const [form, setForm] = useState(FORM_INICIAL)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('') // success guarda el mensaje de éxito después de registrarse
-  const [loading, setLoading] = useState(false) // Loaging guarda el estado de carga mientras se envía el formulario
+  const [loading, setLoading] = useState(false)
   const { register } = useAuth()
   const navigate = useNavigate() // useNavigate redirige a la página de perfil 
   // después de registrarse
@@ -27,19 +27,16 @@ export default function Register() {
     // el estado del formulario, usando el nombre del input como clave y el valor del input como valor
   }
 
-  const handleSubmit = async (e) => { // handleSubmit se ejecuta
-  //  cuando el usuario envía el formulario
-    e.preventDefault() // e es el evento del formulario, 
-    // preventDefault evita que se recargue la página
-    setError('') // setError limpia el mensaje de error antes de enviar el formulario
-    setSuccess('')
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
     setLoading(true)
     try {
-      await register(form) // form es el estado del formulario, que contiene los valores de los inputs
-      setSuccess('Cuenta creada correctamente. Redirigiend  o...')
-      setTimeout(() => navigate('/perfil'), 1200) // redirige a la página de perfil 
-      // después de 1.2 segundos
-
+      await register(form)
+      navigate('/login', {
+        state: { email: form.Email, registered: true },
+        replace: true,
+      })
     } catch (err) {
       setError(err.response?.data?.msg || 'No se pudo crear la cuenta')
     } finally {
@@ -54,7 +51,6 @@ export default function Register() {
         <p className="auth-subtitle">Completa tus datos para entrar a Shortia.</p>
 
         {error && <div className="form-message error">{error}</div>}
-        {success && <div className="form-message success">{success}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="field">
@@ -143,14 +139,7 @@ export default function Register() {
 
           <div className="field">
             <label htmlFor="Pais">País</label>
-            <input
-              id="Pais"
-              name="Pais"
-              required
-              value={form.Pais}
-              onChange={handleChange}
-              placeholder="Ej: Colombia"
-            />
+            <PaisSelect value={form.Pais} onChange={handleChange} />
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={loading}>
