@@ -1,26 +1,56 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config(); // Carga las variables definidas en el .env
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config();
 
-// createPool: reutiliza conexiones automáticamente
-const pool = mysql.createPool({
-  host:     process.env.DB_HOST,
-  port:     process.env.DB_PORT,
-  user:     process.env.DB_USER,
+const sslConfig = process.env.DB_SSL === 'true'
+  ? { rejectUnauthorized: false }
+  : undefined;
+
+const dbConfig = {
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  connectionLimit: process.env.DB_POOL_LIMIT || 10,
+  ssl: sslConfig,
+};
+
+const pool = mysql.createPool({
+  ...dbConfig,
+  connectionLimit: Number(process.env.DB_POOL_LIMIT) || 10,
   waitForConnections: true,
 });
 
-// Verificar conexión al iniciar
-pool.getConnection()
-  .then(conn => {
+async function inicializarBaseDeDatos() {
+  try {
+    const conn = await pool.getConnection();
     console.log('✅ MySQL conectado');
-    conn.release(); // devolver al pool
-  })
-  .catch(err => {
+
+    // Revisar si la tabla 'usuarios' ya existe en Aiven
+    const [tables] = await conn.query("SHOW TABLES LIKE 'usuarios'");
+    conn.release();
+
+    if (tables.length === 0) {
+      console.log('⏳ Creando tablas desde database.sql...');
+      const sqlPath = path.join(__dirname, '../../database.sql');
+      const sqlScript = fs.readFileSync(sqlPath, 'utf8');
+
+      // Conexión temporal con multipleStatements para ejecutar todo el archivo .sql
+      const initConn = await mysql.createConnection({
+        ...dbConfig,
+        multipleStatements: true,
+      });
+      await initConn.query(sqlScript);
+      await initConn.end();
+      console.log('✅ Tablas y datos iniciales cargados en Aiven');
+    }
+  } catch (err) {
     console.error('❌ Error MySQL:', err.message);
-    process.exit(1); // detener app si no hay DB
-  });
+    process.exit(1);
+  }
+}
+
+inicializarBaseDeDatos();
 
 module.exports = pool;
