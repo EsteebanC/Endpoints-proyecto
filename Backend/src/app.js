@@ -8,9 +8,25 @@ const app = express();
 const esOrigenLocal = (origin) =>
   !origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
 
+// Dominio del frontend en Vercel (producción y despliegues de preview).
+const esOrigenVercel = (origin) =>
+  /^https:\/\/endpoints-proyecto-frontend(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+
+// Permite agregar dominios propios desde Render sin tocar el código:
+// FRONTEND_URL=https://midominio.com,https://otro-dominio.com
+const origenesExtra = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((url) => url.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
+const esOrigenPermitido = (origin) =>
+  esOrigenLocal(origin) || esOrigenVercel(origin) || origenesExtra.includes(origin);
+
 app.use(cors({
-  origin: (origin, callback) => callback(null, esOrigenLocal(origin)),
+  origin: (origin, callback) => callback(null, esOrigenPermitido(origin)),
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204,
 }));
 app.use(express.json()); // Parsea el cuerpo de las solicitudes como JSON
 
