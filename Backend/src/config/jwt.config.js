@@ -1,3 +1,5 @@
+// JWT.Config.js
+
 require('dotenv').config();
 
 // Configuración de JWT
