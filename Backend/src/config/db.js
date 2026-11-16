@@ -45,8 +45,8 @@ async function inicializarBaseDeDatos() {
       await initConn.end();
       console.log('✅ Tablas y datos iniciales cargados en Aiven');
     }
-  } catch (err) {
-    console.error('❌ Error MySQL:', err.message);
+} catch (err) {
+    console.error('❌ Error MySQL (Host leído:', process.env.DB_HOST || 'NO DEFINIDO', '):', err);
     process.exit(1);
   }
 }
