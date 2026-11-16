@@ -4,6 +4,10 @@
   "outputDirectory": "Frontend/dist",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://endpoints-proyecto.onrender.com/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

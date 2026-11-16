@@ -1,8 +1,11 @@
 import axios from 'axios'
 
 const api = axios.create({
-  // Si no hay .env, usa el backend local por defecto.
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api', // poner url del render
+  // En producción usa /api (mismo dominio, Vercel lo reenvía al backend) para
+  // evitar CORS. En desarrollo usa el backend local.
+  baseURL: import.meta.env.DEV
+    ? import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+    : '/api',
 })
 
 api.interceptors.request.use((config) => {
