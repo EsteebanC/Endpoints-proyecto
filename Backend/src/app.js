@@ -4,30 +4,56 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-// En desarrollo el frontend puede abrirse en 5173, 5174, etc.
-const esOrigenLocal = (origin) =>
-  !origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
+// CORS: debe ir antes que cualquier ruta para que también cubra los preflight
+// (OPTIONS) de todos los endpoints /api/*.
 
-// Dominio del frontend en Vercel (producción y despliegues de preview).
+// Desarrollo: localhost, 127.0.0.1, [::1] y red local (para probar desde el móvil).
+const esOrigenLocal = (origin) => {
+  if (!origin) return true; // Postman, curl, health checks de Render
+  return (
+    /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(origin) ||
+    /^https?:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/i.test(origin) ||
+    /^https?:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/i.test(origin) ||
+    /^https?:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}(:\d+)?$/i.test(origin)
+  );
+};
+
+// Producción: cualquier despliegue de Vercel (incluye producción y previews,
+// por ejemplo endpoints-proyecto-frontend.vercel.app o
+// endpoints-proyecto-frontend-git-feature-smul-equipo.vercel.app).
 const esOrigenVercel = (origin) =>
-  /^https:\/\/endpoints-proyecto-frontend(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+  Boolean(origin) && /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.vercel\.app$/i.test(origin);
 
-// Permite agregar dominios propios desde Render sin tocar el código:
-// FRONTEND_URL=https://midominio.com,https://otro-dominio.com
+// Dominios propios sin tocar el código. En Render:
+// FRONTEND_URL=https://midominio.com,https://www.midominio.com
 const origenesExtra = (process.env.FRONTEND_URL || '')
   .split(',')
-  .map((url) => url.trim().replace(/\/$/, ''))
+  .map((url) => url.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
 const esOrigenPermitido = (origin) =>
   esOrigenLocal(origin) || esOrigenVercel(origin) || origenesExtra.includes(origin);
 
-app.use(cors({
-  origin: (origin, callback) => callback(null, esOrigenPermitido(origin)),
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (esOrigenPermitido(origin)) return callback(null, true);
+    console.warn(`[CORS] Origen bloqueado: ${origin}`);
+    return callback(null, false);
+  },
   methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Accept',
+    'Origin',
+    'X-Requested-With',
+  ],
+  exposedHeaders: ['Content-Length', 'Content-Type'],
   optionsSuccessStatus: 204,
-}));
+  maxAge: 86400, // cachea el preflight 24 h para no repetirlo en cada petición
+};
+
+app.use(cors(corsOptions));
 app.use(express.json()); // Parsea el cuerpo de las solicitudes como JSON
 
 // Health check (público)
