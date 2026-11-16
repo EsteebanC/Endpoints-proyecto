@@ -1,14 +1,17 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react' // create context para crear un contexto de autenticación, 
+// usecontext para acceder al contexto, 
+// useeffect para ejecutar código al montar el componente y usestate para guardar el estado del usuario y la carga
 import { registrar, iniciarSesion, obtenerPerfil } from '../services/auth'
 
 const AuthContext = createContext(null)
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(AuthContext) // exporta un hook para acceder al contexto de autenticación
 
-export function AuthProvider({ children }) {
+export function AuthProvider({ children }) { //children es el contenido que se renderiza dentro del proveedor de contexto, 
+  // osea los componentes hijos que necesitan acceder al contexto de autenticación
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const logout = () => {
+  const logout = () => { 
     localStorage.removeItem('token')
     setUser(null)
   }
@@ -20,7 +23,8 @@ export function AuthProvider({ children }) {
     }
     obtenerPerfil()
       .then(setUser)
-      .catch(logout)
+      .catch(logout) // logout si el token es inválido o ha expirado y 
+      // no se puede obtener el perfil del usuario
       .finally(() => setLoading(false))
   }, [])
 
@@ -30,13 +34,10 @@ export function AuthProvider({ children }) {
     setUser(await obtenerPerfil())
   }
 
+  // El registro no inicia sesión automáticamente: el usuario debe entrar
+  // con sus credenciales desde el login.
   const register = async (datos) => {
-    const data = await registrar(datos)
-    if (data.token) {
-      localStorage.setItem('token', data.token)
-      setUser(await obtenerPerfil())
-    }
-    return data
+    return registrar(datos)
   }
 
   return (
